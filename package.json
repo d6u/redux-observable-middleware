@@ -28,6 +28,7 @@
   },
   "scripts": {
     "clean": "rimraf lib",
+    "check": "echo fine",
     "build:lib": "babel src --out-dir lib",
     "build": "npm run build:lib",
     "preversion": "npm run check",
