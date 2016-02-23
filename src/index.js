@@ -3,7 +3,7 @@ function observableMiddleware({ dispatch, getState }) {
     if (action.observable != null &&
       typeof action.observable.subscribe === 'function')
     {
-      observable.subscribe(
+      action.observable.subscribe(
         function onNext(data) {
           dispatch({ type: `${action.type}_ON_NEXT`, data });
         },
