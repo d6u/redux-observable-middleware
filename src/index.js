@@ -7,8 +7,14 @@ function observableMiddleware({ dispatch, getState }) {
     {
       const ON_SUBSCRIBE_TYPE = getType(action.type, 'onSubscribe', '');
       const ON_NEXT_TYPE = getType(action.type, 'onNext', `_ON_NEXT`);
-      const ON_ERROR_TYPE = getType(action.type, 'onError', `_ON_ERROR`);;
-      const ON_COMPLETED_TYPE = getType(action.type, 'onCompleted', `_ON_COMPLETED`);;
+      const ON_ERROR_TYPE = getType(action.type, 'onError', `_ON_ERROR`);
+      const ON_COMPLETED_TYPE = getType(action.type, 'onCompleted', `_ON_COMPLETED`);
+
+      if (ON_SUBSCRIBE_TYPE != null) {
+        const actionClone = Object.assign({}, action);
+        actionClone.type = ON_SUBSCRIBE_TYPE;
+        next(actionClone);
+      }
 
       action.observable.subscribe(
         ON_NEXT_TYPE && function onNext(data) {
@@ -22,11 +28,6 @@ function observableMiddleware({ dispatch, getState }) {
         }
       );
 
-      if (ON_SUBSCRIBE_TYPE != null) {
-        const actionClone = Object.assign({}, action);
-        actionClone.type = ON_SUBSCRIBE_TYPE;
-        next(actionClone);
-      }
     } else {
       next(action);
     }

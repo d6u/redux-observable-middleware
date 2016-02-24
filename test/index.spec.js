@@ -131,3 +131,45 @@ test('ignores unspecified type', function (t) {
     observable: obs,
   });
 });
+
+test('always sends onSubscribe action first', function (t) {
+  t.plan(4);
+  const obs = Rx.Observable.from([0, 1]);
+  const reducerExpectation = [
+    { type: 'SUB', observable: obs },
+    { type: 'DONE' },
+  ];
+  const subExpectation = [null, 100];
+
+  function reducer(state = null, action) {
+
+    if (action.type !== '@@redux/INIT') {
+      t.deepLooseEqual(action, reducerExpectation.shift());
+    }
+
+    switch (action.type) {
+    case 'YO':
+      return action.data;
+    case 'OOPS':
+      return state;
+    case 'DONE':
+      return 100;
+    default:
+      return state;
+    }
+  }
+
+  const store = Redux.createStore(reducer, Redux.applyMiddleware(observableMiddleware));
+  store.subscribe(() => {
+    t.equal(store.getState(), subExpectation.shift());
+  });
+
+  store.dispatch({
+    type: {
+      onSubscribe: 'SUB',
+      onError: 'OOPS',
+      onCompleted: 'DONE',
+    },
+    observable: obs,
+  });
+});
